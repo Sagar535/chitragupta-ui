@@ -3,6 +3,9 @@ import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 
 export default function Home() {
+  useEffect(() => {
+    console.log("In HOME")
+  }, [])
   return (
     <div className={styles.container}>
       <Head>
