@@ -14,10 +14,9 @@ import { handleUnauthorized } from '../lib/utils'
 import Navbar from '../components/layout/Navbar'
 
 
-function Calendar({ user }) {
+const Calendar = ({ user }) => {
   const router = useRouter()
 
-  // const [leaveRequests, setLeaveRequests] = useState([]);
   const [leaveRequest, setLeaveRequest] = useState({})
   const [creatingLeaveRequest, setCreatingLeaveRequest] = useState(false)
   const [updatingLeaveRequest, setUpdatingLeaveRequest] = useState(false)
@@ -41,7 +40,7 @@ function Calendar({ user }) {
   }
 
   const fullCalendarEndDate = (date) => {
-    let end_date = new Date(date)
+    const end_date = new Date(date)
     end_date.setDate(end_date.getDate() + 1)
     end_date.toLocaleString()
     // we need to make sure we have date in YY-MM-DD format
@@ -89,7 +88,6 @@ function Calendar({ user }) {
         const leave_request = dataFormatter.deserialize(response.data)
         leave_request.start = leave_request.start_date
         leave_request.end = leave_request.end_date
-        setLeaveRequests([...leaveRequests, leave_request])
       } else {
         setError(response.data.message)
       }
@@ -106,8 +104,8 @@ function Calendar({ user }) {
   const updateEvent = async (status) => {
     const leave_request = {
       ...leaveRequest,
-      status: status,
       approver_id: (isAdmin() || null) && user.id,
+      status,
     }
 
     // update leave request
@@ -115,7 +113,7 @@ function Calendar({ user }) {
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${leaveRequest.id}.json`,
         {
-          leave_request: leave_request,
+          leave_request,
         },
         { headers: { Authorization: localStorage.token } },
       )
@@ -128,15 +126,15 @@ function Calendar({ user }) {
         leave_request.end = leave_request.end_date
 
         // find index of the updated leave_request
-        const index = leaveRequests.findIndex(
-          (leave) => leave.id === leave_request.id,
-        )
+        // const index = leaveRequests.findIndex(
+        //   (leave) => leave.id === leave_request.id,
+        // )
 
         // update leave_request at the index
-        const leave_requests = [...leaveRequests]
-        leave_requests[index] = leave_request
-
-        setLeaveRequests(leave_requests)
+        // const leave_requests = [...leaveRequests]
+        // leave_requests[index] = leave_request
+        //
+        // setLeaveRequests(leave_requests)
       } else {
         setError(response.data.message)
       }
@@ -153,7 +151,7 @@ function Calendar({ user }) {
     setError('')
 
     //  first get id of leave request with
-    const id = event.id
+    const { id } = event
 
     // make request to remote API to get leave request detail
     const response = await axios.get(
@@ -215,15 +213,15 @@ function Calendar({ user }) {
           <div>
             <div className="flex justify-between">
               <LeaveBalanceBadge
-                label={'Sick Leave Balance'}
+                label='Sick Leave Balance'
                 balance={user.sick_leave_balance || 0}
               />
               <LeaveBalanceBadge
-                label={'Paid Leave Balance'}
+                label='Paid Leave Balance'
                 balance={user.paid_leave_balance || 0}
               />
               <LeaveBalanceBadge
-                label={'Unpaid Leave Balance'}
+                label='Unpaid Leave Balance'
                 balance={user.unpaid_leave_balance || 0}
               />
             </div>
@@ -237,19 +235,19 @@ function Calendar({ user }) {
             >
               <Option
                 value="sick_leave"
-                selected={leaveRequest.leave_type == 'sick_leave'}
+                selected={leaveRequest.leave_type === 'sick_leave'}
               >
                 Sick Leave
               </Option>
               <Option
                 value="personal"
-                selected={leaveRequest.leave_type == 'personal'}
+                selected={leaveRequest.leave_type === 'personal'}
               >
                 Personal
               </Option>
               <Option
                 value="others"
-                selected={leaveRequest.leave_type == 'others'}
+                selected={leaveRequest.leave_type === 'others'}
               >
                 Others
               </Option>
@@ -278,15 +276,15 @@ function Calendar({ user }) {
         >
           <div className="flex justify-between">
             <LeaveBalanceBadge
-              label={'Sick Leave Balance'}
+              label='Sick Leave Balance'
               balance={leaveRequest.user.sick_leave_balance}
             />
             <LeaveBalanceBadge
-              label={'Paid Leave Balance'}
+              label='Paid Leave Balance'
               balance={leaveRequest.user.paid_leave_balance}
             />
             <LeaveBalanceBadge
-              label={'Unpaid Leave Balance'}
+              label='Unpaid Leave Balance'
               balance={leaveRequest.user.unpaid_leave_balance}
             />
           </div>
@@ -301,19 +299,19 @@ function Calendar({ user }) {
             >
               <Option
                 value="sick_leave"
-                selected={leaveRequest.leave_type == 'sick_leave'}
+                selected={leaveRequest.leave_type === 'sick_leave'}
               >
                 Sick Leave
               </Option>
               <Option
                 value="personal"
-                selected={leaveRequest.leave_type == 'personal'}
+                selected={leaveRequest.leave_type === 'personal'}
               >
                 Personal
               </Option>
               <Option
                 value="others"
-                selected={leaveRequest.leave_type == 'others'}
+                selected={leaveRequest.leave_type === 'others'}
               >
                 Others
               </Option>

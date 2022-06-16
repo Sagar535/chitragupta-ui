@@ -1,7 +1,6 @@
 import {  useState } from 'react'
 import { connect } from 'react-redux'
 import axios from 'axios'
-import Jsona from 'jsona'
 import DataTable from './DataTable'
 import { columns } from '../../data/salarySettingsTableData'
 import { TableContainer } from '../modalComponents'
@@ -10,18 +9,13 @@ import Modal from '../modal'
 import SalarySettingForm from '../salarySettingForm'
 import { fetchSalarySettings } from '../../redux/actions/dashboardActions'
 
-function SalariesDataTable({
-  salarySettings,
-  setSalarySettings,
-  fetchSalarySettings,
-}) {
+const SalariesDataTable = ({ fetchSalarySettings }) => {
   const [salarySetting, setSalarySetting] = useState({})
   const [createNew, setCreateNew] = useState(false)
   const [errors, setErrors] = useState({})
   const [taxRules, setTaxRules] = useState([])
   const [updatingSalarySetting, setUpdatingSalarySetting] = useState(false)
 
-  const dataFormatter = new Jsona()
   const creatingNew = () => setCreateNew(true)
   const numberRegEx = /^\d+.?\d*$/
 
@@ -97,10 +91,6 @@ function SalariesDataTable({
         )
 
         if (response.statusText === 'OK') {
-          setSalarySettings([
-            dataFormatter.deserialize(response.data),
-            ...salarySettings,
-          ])
           setCreateNew(false)
           setSalarySetting({})
           setTaxRules([])
@@ -158,7 +148,7 @@ function SalariesDataTable({
       setErrors({ ...errors, [e.target.name]: null })
     }
     const index = taxRules.findIndex(
-      (taxRule) => taxRule.id == e.target.id || taxRule.key == e.target.id,
+      (taxRule) => taxRule.id === e.target.id || taxRule.key === e.target.id,
     )
     const name_with_key = e.target.name
     const name_without_key = name_with_key.split('_').slice(0, -1).join('_')

@@ -31,7 +31,7 @@ const RouteGuard = (props) => {
       props.setToken(token)
     }
     if(props.redirect) {
-      const redirect = props.redirect
+      const { redirect } = props
 
       router.push(redirect)
       props.resetRedirect()

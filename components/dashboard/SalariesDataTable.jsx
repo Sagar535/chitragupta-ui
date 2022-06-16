@@ -10,7 +10,7 @@ import Modal from '../modal'
 import InputWithLabelAndError from '../InputWithLabelAndError'
 import { fetchSalaries } from '../../redux/actions/dashboardActions'
 
-function SalariesDataTable({ salaries, setSalaries, fetchSalaries }) {
+const SalariesDataTable = ({ salaries, setSalaries, fetchSalaries }) => {
   const [salary, setSalary] = useState({})
   const [createNewSalary, setCreateNewSalary] = useState(false)
   const [errors, setErrors] = useState({})

@@ -11,17 +11,17 @@ import {
 } from '../../redux/actions/dashboardActions'
 import { createOvertime } from '../../redux/actions/overtimeActions'
 import Modal from '../modal'
-import { Btn, Input, Label } from '../formComponents'
+import { Btn, Label } from '../formComponents'
 import InputWithLabelAndError from '../InputWithLabelAndError'
 import { TableContainer } from '../modalComponents'
 
-function OvertimesDataTable({
+const OvertimesDataTable = ({
   fetchOvertimes,
   createOvertime,
   setShowModal,
   approver,
   showModal,
-}) {
+}) => {
   const isAdmin = () => approver && approver.role === 'admin'
   const dataFormatter = new Jsona()
   const numberRegEx = /^\d*$/

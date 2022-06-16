@@ -8,7 +8,7 @@ import DataTable from './DataTable'
 import Alert from '../alert'
 import { fetchSalaryRecords } from '../../redux/actions/dashboardActions'
 
-function SalaryRecordsDataTable({ fetchSalaryRecords }) {
+const SalaryRecordsDataTable = ({ fetchSalaryRecords }) => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [date, setDate] = useState(null)
