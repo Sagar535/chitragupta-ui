@@ -47,11 +47,15 @@ const Navbar = (props) => {
             onClick={() => setShowDropDown(!showDropdown)}
           >
             {props.user.first_name} {props.user.last_name}
+            { props.user.first_name || props.user.last_name ? '' : 'N/A' }
           </DropdownTrigger>
 
           {showDropdown && (
             <DropdownMenu>
               <DropdownItem onClick={handleLogout}>Logout</DropdownItem>
+              <DropdownItem href={`/admin/users/${props.user.id}`}>
+                  Profile
+              </DropdownItem>
             </DropdownMenu>
           )}
         </Dropdown>

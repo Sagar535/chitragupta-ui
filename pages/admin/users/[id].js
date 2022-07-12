@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
-import { connect } from 'react-redux'
-import { useRouter } from 'next/router'
+import {useState, useEffect} from 'react'
+import {connect} from 'react-redux'
+import {useRouter} from 'next/router'
 import axios from 'axios'
 import Navbar from '../../../components/layout/Navbar'
 import {
@@ -11,29 +11,31 @@ import {
   Option,
 } from '../../../components/formComponents'
 import Modal from '../../../components/modal'
-import { fetchUser } from '../../../redux/actions/usersActions'
-import { fetchAllSalaries } from '../../../redux/actions/dashboardActions'
+import {fetchUser} from '../../../redux/actions/usersActions'
+import {fetchAllSalaries} from '../../../redux/actions/dashboardActions'
 
-const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
+const User = ({fetchUser, fetchAllSalaries, currentUser, user, salaries}) => {
   const isAdmin = () => currentUser && currentUser.role === 'admin'
+  const [settingUserSalary, setSettingUserSalary] = useState(false)
   const [updatingUser, setUpdatingUser] = useState(false)
   const [salary, setSalary] = useState(null)
-  const [startDate, setStartDate] = useState(
+  const [joinDate, setJoinDate] = useState(null)
+  const [salaryStartDate, setSalaryStartDate] = useState(
     new Date().toISOString().slice(0, 10),
   )
   const [status, setStatus] = useState(null)
   const [errors, setErrors] = useState({})
   const router = useRouter()
-  const { id: user_id } = router.query
+  const {id: user_id} = router.query
 
   const MAX_SICK_LEAVE_BALANCE = 5
   const MAX_PAID_LEAVE_BALANCE = 18
   const MAX_UNPAID_LEAVE_BALANCE = 25
 
   const statuses = [
-    { id: 0, status: 'invited' },
-    { id: 1, status: 'active' },
-    { id: 2, status: 'disabled' },
+    {id: 0, status: 'invited'},
+    {id: 1, status: 'active'},
+    {id: 2, status: 'disabled'},
   ]
 
   const leave_percentage = (leave_balance, total) =>
@@ -50,33 +52,41 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
     }
   }, [currentUser])
 
+  useEffect(() => {
+    if (Object.keys(user).length > 0) {
+      setSalary(user.active_salary?.id)
+      setStatus(user.status)
+      setJoinDate(user.start_date)
+      // user && setSalaryStartDate(user.active_salary.start_date)
+    }
+  }, [user])
+
   const checkIfFormIsValid = () => {
     let errorCount = 0
     if (!salary) {
       errors.salary = "Can't be blank."
       // console.log(errors);
-      setErrors({ ...errors })
+      setErrors({...errors})
       errorCount += 1
     }
 
     return errorCount
   }
 
-  const updateUser = async () => {
+  const setUserSalary = async () => {
     if (checkIfFormIsValid() === 0) {
       // make request to remote api to create or update user salary
       try {
-        await axios.put(
+        const response = await axios.patch(
           `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${user_id}.json`,
           {
             user: {
               user_salaries_attributes: [
                 {
                   salary_id: salary,
-                  start_date: startDate,
+                  start_date: salaryStartDate,
                 },
               ],
-              status,
             },
           },
           {
@@ -85,6 +95,10 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
             },
           },
         )
+
+        if (response.statusText === "OK") {
+          setSettingUserSalary(false)
+        }
       } catch (error) {
         console.log(error)
         // handleUnauthorized(error, setToken, router)
@@ -92,14 +106,46 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
     }
   }
 
+  const updateUser = async () => {
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${user_id}.json`,
+        {
+          user: {
+            status,
+            start_date: joinDate
+          },
+        },
+        {
+          headers: {
+            Authorization: localStorage.token,
+          },
+        },
+      )
+
+      if (response.statusText === "OK") {
+        setUpdatingUser(false)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <>
-      <Navbar />
+      <Navbar/>
 
       {isAdmin() && (
         <div className="flex flex-row-reverse">
           <Btn
             className="mr-4 bg-gray-500 hover:bg-gray-400"
+            onClick={() => setSettingUserSalary(true)}
+          >
+            Set New Salary
+          </Btn>
+
+          <Btn
+            className="ml-4 mr-4 bg-gray-500 hover:bg-gray-400"
             onClick={() => setUpdatingUser(true)}
           >
             Edit
@@ -122,7 +168,7 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
                     {user && `${user.first_name} ${user.last_name}`}
                   </h2>
                 </div>
-                <div className="w-full my-4 border-b-2" />
+                <div className="w-full my-4 border-b-2"/>
               </div>
             </div>
 
@@ -142,8 +188,8 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
                       strokeLinejoin="round"
                       className="feather feather-mail"
                     >
-                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                      <polyline points="22,6 12,13 2,6" />
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                      <polyline points="22,6 12,13 2,6"/>
                     </svg>
                   </span>
                   {user && user.email}
@@ -165,10 +211,10 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
                       strokeLinejoin="round"
                       className="feather feather-calendar"
                     >
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                      <line x1="16" y1="2" x2="16" y2="6" />
-                      <line x1="8" y1="2" x2="8" y2="6" />
-                      <line x1="3" y1="10" x2="21" y2="10" />
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
                     </svg>
                   </span>
                   {user && user.start_date}
@@ -245,11 +291,11 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
         </div>
       </div>
 
-      {updatingUser && (
+      {settingUserSalary && (
         <Modal
-          showModal={updatingUser}
-          setShowModal={setUpdatingUser}
-          title="Update User"
+          showModal={settingUserSalary}
+          setShowModal={setSettingUserSalary}
+          title="Set User Salary"
         >
           <div>
             <Label
@@ -274,6 +320,27 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
               <span className="text-sm text-red-500">{errors.salary}</span>
             )}
 
+            <Label>New Salary Start Date</Label>
+            <Input
+              value={salaryStartDate}
+              onChange={(e) => setSalaryStartDate(e.target.value)}
+              type="date"
+            />
+
+            <Btn className="bg-green-400" onClick={setUserSalary}>
+              Submit
+            </Btn>
+          </div>
+        </Modal>
+      )}
+
+      {updatingUser && (
+        <Modal
+          showModal={updatingUser}
+          setShowModal={setUpdatingUser}
+          title="Update User"
+        >
+          <div>
             <Label
               className={`${errors.salary ? 'text-red-500' : 'text-gray-500'}`}
             >
@@ -295,10 +362,10 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
               <span className="text-sm text-red-500">{errors.status}</span>
             )}
 
-            <Label>Start Date</Label>
+            <Label>Join Date</Label>
             <Input
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              value={joinDate}
+              onChange={(e) => setJoinDate(e.target.value)}
               type="date"
             />
 
@@ -313,7 +380,7 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
 }
 
 export default connect(
-  (state) => ({ currentUser: state.auth.user, user: state.users.user, salaries: state.records.records }),
+  (state) => ({currentUser: state.auth.user, user: state.users.user, salaries: state.records.records}),
   {
     fetchUser,
     fetchAllSalaries,
