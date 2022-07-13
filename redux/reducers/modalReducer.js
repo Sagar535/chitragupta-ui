@@ -1,8 +1,9 @@
-import { SET_NEW_MODAL, SET_UDPATE_MODAL } from "../actions/types";
+import {SET_NEW_MODAL, SET_SALARY_MODAL, SET_UDPATE_MODAL} from "../actions/types";
 
 const initialState = {
   newModal: false,
-  updateModal: false
+  updateModal: false,
+  salaryModal: false,
 }
 
 export default (state = initialState, action) => {
@@ -16,6 +17,11 @@ export default (state = initialState, action) => {
       return {
         ...state,
         updateModal: action.payload
+      }
+    case SET_SALARY_MODAL:
+      return {
+        ...state,
+        salaryModal: action.payload
       }
     default:
       return state;

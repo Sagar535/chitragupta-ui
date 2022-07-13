@@ -21,6 +21,7 @@ const Alert = (props) => {
               : 'bg-red-100 border-red-400 text-red-400'
           } border px-4 py-3 rounded fixed left-2/4 -translate-x-1/2`}
           role="alert"
+          style={{zIndex: 100}}
         >
           <span className="">{JSON.stringify(message)}</span>
 

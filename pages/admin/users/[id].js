@@ -1,7 +1,6 @@
 import {useState, useEffect} from 'react'
 import {connect} from 'react-redux'
 import {useRouter} from 'next/router'
-import axios from 'axios'
 import Navbar from '../../../components/layout/Navbar'
 import {
   Btn,
@@ -13,18 +12,30 @@ import {
 import Modal from '../../../components/modal'
 import {fetchUser} from '../../../redux/actions/usersActions'
 import {fetchAllSalaries} from '../../../redux/actions/dashboardActions'
+import {setSalaryModal, setUserSalary} from "../../../redux/actions/salaryActions";
+import {setUpdateModal} from "../../../redux/actions/modalActions";
+import {updateUser} from "../../../redux/actions/userActions";
 
-const User = ({fetchUser, fetchAllSalaries, currentUser, user, salaries}) => {
+const User = ({
+                currentUser,
+                user,
+                salaries,
+                salaryModal,
+                updateModal,
+                fetchUser,
+                fetchAllSalaries,
+                setSalaryModal,
+                setUserSalary,
+                setUpdateModal,
+                updateUser,
+              }) => {
   const isAdmin = () => currentUser && currentUser.role === 'admin'
-  const [settingUserSalary, setSettingUserSalary] = useState(false)
-  const [updatingUser, setUpdatingUser] = useState(false)
   const [salary, setSalary] = useState(null)
   const [joinDate, setJoinDate] = useState(null)
   const [salaryStartDate, setSalaryStartDate] = useState(
     new Date().toISOString().slice(0, 10),
   )
   const [status, setStatus] = useState(null)
-  const [errors, setErrors] = useState({})
   const router = useRouter()
   const {id: user_id} = router.query
 
@@ -61,76 +72,6 @@ const User = ({fetchUser, fetchAllSalaries, currentUser, user, salaries}) => {
     }
   }, [user])
 
-  const checkIfFormIsValid = () => {
-    let errorCount = 0
-    if (!salary) {
-      errors.salary = "Can't be blank."
-      // console.log(errors);
-      setErrors({...errors})
-      errorCount += 1
-    }
-
-    return errorCount
-  }
-
-  const setUserSalary = async () => {
-    if (checkIfFormIsValid() === 0) {
-      // make request to remote api to create or update user salary
-      try {
-        const response = await axios.patch(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${user_id}.json`,
-          {
-            user: {
-              user_salaries_attributes: [
-                {
-                  salary_id: salary,
-                  start_date: salaryStartDate,
-                },
-              ],
-            },
-          },
-          {
-            headers: {
-              Authorization: localStorage.token,
-            },
-          },
-        )
-
-        if (response.statusText === "OK") {
-          setSettingUserSalary(false)
-        }
-      } catch (error) {
-        console.log(error)
-        // handleUnauthorized(error, setToken, router)
-      }
-    }
-  }
-
-  const updateUser = async () => {
-    try {
-      const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${user_id}.json`,
-        {
-          user: {
-            status,
-            start_date: joinDate
-          },
-        },
-        {
-          headers: {
-            Authorization: localStorage.token,
-          },
-        },
-      )
-
-      if (response.statusText === "OK") {
-        setUpdatingUser(false)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   return (
     <>
       <Navbar/>
@@ -139,14 +80,14 @@ const User = ({fetchUser, fetchAllSalaries, currentUser, user, salaries}) => {
         <div className="flex flex-row-reverse">
           <Btn
             className="mr-4 bg-gray-500 hover:bg-gray-400"
-            onClick={() => setSettingUserSalary(true)}
+            onClick={() => setSalaryModal(true)}
           >
             Set New Salary
           </Btn>
 
           <Btn
             className="ml-4 mr-4 bg-gray-500 hover:bg-gray-400"
-            onClick={() => setUpdatingUser(true)}
+            onClick={() => setUpdateModal(true)}
           >
             Edit
           </Btn>
@@ -291,21 +232,18 @@ const User = ({fetchUser, fetchAllSalaries, currentUser, user, salaries}) => {
         </div>
       </div>
 
-      {settingUserSalary && (
+      {salaryModal && (
         <Modal
-          showModal={settingUserSalary}
-          setShowModal={setSettingUserSalary}
+          showModal={salaryModal}
+          setShowModal={setSalaryModal}
           title="Set User Salary"
         >
           <div>
-            <Label
-              className={`${errors.salary ? 'text-red-500' : 'text-gray-500'}`}
-            >
+            <Label>
               Select salary
             </Label>
             <Select
               onChange={(e) => setSalary(e.target.value)}
-              className={errors.salary ? 'border-red-500' : ''}
               defaultValue={user.active_salary && user.active_salary.id}
             >
               <Option>...</Option>
@@ -316,9 +254,6 @@ const User = ({fetchUser, fetchAllSalaries, currentUser, user, salaries}) => {
                 </Option>
               ))}
             </Select>
-            {errors.salary && (
-              <span className="text-sm text-red-500">{errors.salary}</span>
-            )}
 
             <Label>New Salary Start Date</Label>
             <Input
@@ -327,28 +262,25 @@ const User = ({fetchUser, fetchAllSalaries, currentUser, user, salaries}) => {
               type="date"
             />
 
-            <Btn className="bg-green-400" onClick={setUserSalary}>
+            <Btn className="bg-green-400" onClick={() => setUserSalary(user_id, salary, salaryStartDate)}>
               Submit
             </Btn>
           </div>
         </Modal>
       )}
 
-      {updatingUser && (
+      {updateModal && (
         <Modal
-          showModal={updatingUser}
-          setShowModal={setUpdatingUser}
+          showModal={updateModal}
+          setShowModal={setUpdateModal}
           title="Update User"
         >
           <div>
-            <Label
-              className={`${errors.salary ? 'text-red-500' : 'text-gray-500'}`}
-            >
+            <Label>
               Select Status
             </Label>
             <Select
               onChange={(e) => setStatus(e.target.value)}
-              className={errors.status ? 'border-red-500' : ''}
               defaultValue={user.status}
             >
               <Option value={null}>...</Option>
@@ -358,9 +290,6 @@ const User = ({fetchUser, fetchAllSalaries, currentUser, user, salaries}) => {
                 </Option>
               ))}
             </Select>
-            {errors.status && (
-              <span className="text-sm text-red-500">{errors.status}</span>
-            )}
 
             <Label>Join Date</Label>
             <Input
@@ -369,7 +298,7 @@ const User = ({fetchUser, fetchAllSalaries, currentUser, user, salaries}) => {
               type="date"
             />
 
-            <Btn className="bg-green-400" onClick={updateUser}>
+            <Btn className="bg-green-400" onClick={() => updateUser(user_id, {status, start_date: joinDate})}>
               Submit
             </Btn>
           </div>
@@ -379,10 +308,22 @@ const User = ({fetchUser, fetchAllSalaries, currentUser, user, salaries}) => {
   )
 }
 
+const mapStateToProps = (state) => ({
+  currentUser: state.auth.user,
+  user: state.users.user,
+  salaries: state.records.records,
+  salaryModal: state.modal.salaryModal,
+  updateModal: state.modal.updateModal,
+})
+
 export default connect(
-  (state) => ({currentUser: state.auth.user, user: state.users.user, salaries: state.records.records}),
+  mapStateToProps,
   {
     fetchUser,
     fetchAllSalaries,
+    setSalaryModal,
+    setUserSalary,
+    setUpdateModal,
+    updateUser,
   },
 )(User)

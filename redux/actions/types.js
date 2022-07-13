@@ -46,6 +46,7 @@ export const RESET_REDIRECT = 'RESET_REDIRECT'
 
 export const SET_NEW_MODAL = 'SET_NEW_MODAL'
 export const SET_UDPATE_MODAL = 'SET_UPDATE_MODAL'
+export const SET_SALARY_MODAL = 'SET_SALARY_MODAL'
 
 // types for server
 export const SET_IS_SERVER = 'SET_IS_SERVER'
