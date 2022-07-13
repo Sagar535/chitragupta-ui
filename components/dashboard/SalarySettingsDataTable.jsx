@@ -1,4 +1,4 @@
-import {  useState } from 'react'
+import { useState} from 'react'
 import { connect } from 'react-redux'
 import DataTable from './DataTable'
 import { columns } from '../../data/salarySettingsTableData'
@@ -114,8 +114,9 @@ const SalariesDataTable = ({
       setErrors({ ...errors, [e.target.name]: null })
     }
     const index = taxRules.findIndex(
-      (taxRule) => taxRule.id === e.target.id || taxRule.key === e.target.id,
+      (taxRule) => String(taxRule.id) === String(e.target.id) || String(taxRule.key) === String(e.target.id),
     )
+
     const name_with_key = e.target.name
     const name_without_key = name_with_key.split('_').slice(0, -1).join('_')
 
@@ -143,8 +144,14 @@ const SalariesDataTable = ({
         <DataTable
           rowClick={(row) => {
             // console.log(row.original);
+            const { tax_rules } = row.original
             setSalarySetting(row.original)
-            setTaxRules(row.original.tax_rules)
+            setTaxRules(tax_rules.map(tax_rule => ({
+              ...tax_rule,
+              [`amount_from_${tax_rule.id}`]: tax_rule.amount_from,
+              [`amount_to_${tax_rule.id}`]: tax_rule.amount_to,
+              [`rate_${tax_rule.id}`]: tax_rule.rate
+            })))
             setUpdatingSalarySetting(true)
           }}
           columns={columns}
