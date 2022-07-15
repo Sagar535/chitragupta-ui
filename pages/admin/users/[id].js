@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react'
 import {connect} from 'react-redux'
 import {useRouter} from 'next/router'
+import axios from 'axios'
 import Navbar from '../../../components/layout/Navbar'
 import {
   Btn,
@@ -119,10 +120,17 @@ const User = ({
       <div className="bg-white w-[300px] mx-auto">
         <div className="pt-10 text-center">
           <div>
-            <div>
+            <div className="profile-section">
               <img
-                className="w-20 h-20 mx-auto rounded-full lg:w-24 lg:h-24"
-                src={`${process.env.NEXT_PUBLIC_REMOTE_URL}/rails${user.avatar_url}`}
+                id="avatar"
+                alt="Profile Pciture"
+                className="w-20 h-20 mx-auto rounded-full lg:w-24 lg:h-24 img-front"
+                src={ user.avatar_url !== '' ? `${process.env.NEXT_PUBLIC_REMOTE_URL}${user.avatar_url}` : '/default_profile.png' }
+              />
+              <img
+                alt="change"
+                className="w-20 h-20 mx-auto rounded-full lg:w-24 lg:h-24 img-top"
+                src='/change_image.png'
               />
               <div>
                 <div className="my-5 text-xs font-medium lg:text-sm">
