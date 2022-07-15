@@ -1,5 +1,6 @@
 import axios from "axios";
 import {returnAlerts, returnErrors} from "./alertActions";
+import {SET_SALARY_MODAL} from "./types";
 
 export const createSalary = (salary) => async (dispatch, getState) => {
   try {
@@ -52,6 +53,53 @@ export const uploadSalaryCSV = (formData) => async(dispatch, getState) => {
       ))
     }
   } catch(error) {
+    dispatch(returnErrors(
+      error.response && error.response.data,
+      error.response && error.response.status
+    ))
+  }
+}
+
+export const setSalaryModal = (payload) => (dispatch) => {
+  dispatch({type: SET_SALARY_MODAL, payload})
+}
+
+export const setUserSalary = (userId, salary, salaryStartDate) => async (dispatch, getState) => {
+  if(!salary) {
+    dispatch(returnErrors("Please select the salary", 400))
+    return
+  }
+
+  if(!salaryStartDate) {
+    dispatch(returnErrors("Please select the salaryStart date", 400))
+    return
+  }
+
+  try {
+    const response = await axios.patch(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${userId}.json`,
+      {
+        user: {
+          user_salaries_attributes: [
+            {
+              salary_id: salary,
+              start_date: salaryStartDate,
+            },
+          ],
+        },
+      },
+      {
+        headers: {
+          Authorization: getState().auth.token,
+        },
+      },
+    )
+
+    if (response.statusText === "OK") {
+      dispatch(setSalaryModal(false))
+      dispatch(returnAlerts("Successfully updated users salary", 200))
+    }
+  } catch (error) {
     dispatch(returnErrors(
       error.response && error.response.data,
       error.response && error.response.status

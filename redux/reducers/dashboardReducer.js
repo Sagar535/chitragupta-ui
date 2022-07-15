@@ -7,6 +7,8 @@ import {
   SET_PAGE,
   SET_BATCH,
   SHOW_MODAL,
+  SET_RECORD,
+  RESET_RECORD,
 } from '../actions/types'
 
 const dataFormatter = new Jsona()
@@ -19,6 +21,7 @@ const initialState = {
   page: 1,
   batch: 10,
   showModal: false,
+  record: {}
 }
 
 export default function (state = initialState, action) {
@@ -39,6 +42,16 @@ export default function (state = initialState, action) {
         records: [...dataFormatter.deserialize(action.payload.data)],
         loading: false,
         total: action.payload.total,
+      }
+    case SET_RECORD:
+      return {
+        ...state,
+        record: dataFormatter.deserialize(action.payload.data) // expecting action.payload = response
+      }
+    case RESET_RECORD:
+      return {
+        ...state,
+        record: {}
       }
     case SET_FETCH_ALL_RECORDS:
       // reset page and batch when toggling fetch all records
