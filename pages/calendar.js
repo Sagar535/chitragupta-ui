@@ -238,7 +238,7 @@ const Calendar = ({
                   className="bg-red-500 hover:bg-red-600"
                   onClick={() => {
                     setSelectedLeave({...leave_request, status: 'rejected'})
-                    updateLeaveRequest()
+                    updateLeaveRequest('rejected')
                   }}
                 >
                   Reject
@@ -247,7 +247,7 @@ const Calendar = ({
                   className="ml-2 bg-green-500 hover:bg-green-600"
                   onClick={() => {
                     setSelectedLeave({...leave_request, status: 'approved'})
-                    updateLeaveRequest()
+                    updateLeaveRequest('rejected')
                   }}
                 >
                   Approve
@@ -258,7 +258,7 @@ const Calendar = ({
             {!isAdmin(user) && (
               <Btn
                 className="bg-blue-500 hover:bg-blue-600"
-                onClick={() => updateLeaveRequest()}
+                onClick={() => updateLeaveRequest(leave_request.status)}
               >
                 Update
               </Btn>

@@ -114,7 +114,7 @@ const Home = (props) => {
                     status: 'rejected',
                     approver_id: props.user.id,
                   })
-                  props.updateLeaveRequest()
+                  props.updateLeaveRequest('rejected')
                 }}
               >
                 Reject
@@ -129,7 +129,7 @@ const Home = (props) => {
                     status: 'approved',
                     approver_id: props.user.id,
                   })
-                  props.updateLeaveRequest()
+                  props.updateLeaveRequest('approved')
                 }}
               >
                 Approve
