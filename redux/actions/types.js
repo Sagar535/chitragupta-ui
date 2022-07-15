@@ -35,6 +35,8 @@ export const SHOW_LEAVE_MODAL = 'SHOW_LEAVE_MODAL'
 
 // types for data table actions
 export const GET_RECORDS = 'GET_RECORDS'
+export const SET_RECORD = 'SET_RECORD'
+export const RESET_RECORD = 'RESET_RECORD'
 export const SET_FETCH_ALL_RECORDS = 'SET_FETCH_ALL_RECORDS'
 export const SET_PAGE = 'SET_PAGE'
 export const SET_BATCH = 'SET_BATCH'
