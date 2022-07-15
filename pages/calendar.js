@@ -247,7 +247,7 @@ const Calendar = ({
                   className="ml-2 bg-green-500 hover:bg-green-600"
                   onClick={() => {
                     setSelectedLeave({...leave_request, status: 'approved'})
-                    updateLeaveRequest('rejected')
+                    updateLeaveRequest('approved')
                   }}
                 >
                   Approve
