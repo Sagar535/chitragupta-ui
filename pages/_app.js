@@ -30,7 +30,7 @@ class WrappedApp extends App {
     return (
       <RouteGuard>
         <Head>
-          <title>Chitragupta App</title>
+          <title>Chitragupta Application</title>
           <meta name="description" content="chitragupta" />
           <link rel="icon" href="/favicon.ico" />
         </Head>

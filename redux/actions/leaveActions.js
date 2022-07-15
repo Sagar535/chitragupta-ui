@@ -104,11 +104,11 @@ export const getLeaveById = (id) => (dispatch, getState) => {
 
 
 // action to update leave requests
-export const updateLeaveRequest = () => (dispatch, getState) => {
+export const updateLeaveRequest = (status) => (dispatch, getState) => {
   // get currently selected leave
   const leave_request = getState().leave.selectedLeave
   const current_user = getState().auth.user
-  const body = JSON.stringify({ leave_request: { ...leave_request, approver_id: current_user.id } })
+  const body = JSON.stringify({ leave_request: { ...leave_request, approver_id: current_user.id, status } })
   axios
     .put(
       `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${leave_request.id}.json`,
