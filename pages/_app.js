@@ -4,6 +4,7 @@ import { wrapper } from '../redux/store';
 import RouteGuard from '../components/routeGuard/RouteGuard';
 import Alert from '../components/alert';
 import '../styles/globals.css';
+import '../styles/image.css'
 import '@fullcalendar/common/main.css';
 import '@fullcalendar/daygrid/main.css';
 

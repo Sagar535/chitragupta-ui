@@ -1,0 +1,14 @@
+.img-top {
+    display: none;
+    top: 0;
+    left: 0;
+    z-index: 99;
+}
+
+.profile-section:hover .img-top {
+    display: inline;
+}
+
+.profile-section:hover #avatar {
+    display: none;
+}

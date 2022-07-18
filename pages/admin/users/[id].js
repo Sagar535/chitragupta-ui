@@ -14,7 +14,7 @@ import {fetchUser} from '../../../redux/actions/usersActions'
 import {fetchAllSalaries} from '../../../redux/actions/dashboardActions'
 import {setSalaryModal, setUserSalary} from "../../../redux/actions/salaryActions";
 import {setUpdateModal} from "../../../redux/actions/modalActions";
-import {updateUser} from "../../../redux/actions/userActions";
+import {updateUser, updateUserImage} from "../../../redux/actions/userActions";
 
 const User = ({
                 currentUser,
@@ -28,6 +28,7 @@ const User = ({
                 setUserSalary,
                 setUpdateModal,
                 updateUser,
+                updateUserImage,
               }) => {
   const isAdmin = () => currentUser && currentUser.role === 'admin'
   const [salary, setSalary] = useState(null)
@@ -48,6 +49,17 @@ const User = ({
     {id: 1, status: 'active'},
     {id: 2, status: 'disabled'},
   ]
+
+  const handleAvatarSubmit = async () => {
+    const imguser = document.querySelector('#avatarUser')
+
+    const avatar = document.getElementById("avatar")
+    avatar.src = URL.createObjectURL(imguser.files[0])
+
+    updateUserImage(user.id, imguser.files[0])
+  }
+
+  const triggerChangeImage  = () => document.getElementById('avatarUser').click()
 
   const leave_percentage = (leave_balance, total) =>
     user ? Math.round((leave_balance / total) * 100) : 0
@@ -71,6 +83,13 @@ const User = ({
       // user && setSalaryStartDate(user.active_salary.start_date)
     }
   }, [user])
+
+  useEffect(() => {
+    // just some event listener
+    if(user?.id === currentUser?.id) {
+      document.getElementById("change-avatar").addEventListener("click", triggerChangeImage)
+    }
+  }, [])
 
   return (
     <>
@@ -97,17 +116,31 @@ const User = ({
       <div className="bg-white w-[300px] mx-auto">
         <div className="pt-10 text-center">
           <div>
-            <div>
+            <div className="profile-section">
               <img
-                className="w-20 h-20 mx-auto rounded-full lg:w-24 lg:h-24"
-                src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80"
-                alt=""
+                id="avatar"
+                alt="Profile Pciture"
+                className="w-20 h-20 mx-auto rounded-full lg:w-24 lg:h-24 img-front"
+                src={ user.avatar_url !== '' ? `${process.env.NEXT_PUBLIC_REMOTE_URL}${user.avatar_url}` : '/default_profile.png' }
+              />
+              <img
+                id="change-avatar"
+                alt="change"
+                className="w-20 h-20 mx-auto rounded-full lg:w-24 lg:h-24 img-top"
+                src='/change_image.png'
               />
               <div>
                 <div className="my-5 text-xs font-medium lg:text-sm">
                   <h2 className="text-2xl">
                     {user && `${user.first_name} ${user.last_name}`}
                   </h2>
+                  <Input
+                    id="avatarUser"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleAvatarSubmit}
+                  />
                 </div>
                 <div className="w-full my-4 border-b-2"/>
               </div>
@@ -325,5 +358,6 @@ export default connect(
     setUserSalary,
     setUpdateModal,
     updateUser,
+    updateUserImage,
   },
 )(User)
