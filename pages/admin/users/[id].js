@@ -15,7 +15,7 @@ import {fetchUser} from '../../../redux/actions/usersActions'
 import {fetchAllSalaries} from '../../../redux/actions/dashboardActions'
 import {setSalaryModal, setUserSalary} from "../../../redux/actions/salaryActions";
 import {setUpdateModal} from "../../../redux/actions/modalActions";
-import {updateUser} from "../../../redux/actions/userActions";
+import {updateUser, updateUserImage} from "../../../redux/actions/userActions";
 
 const User = ({
                 currentUser,
@@ -29,6 +29,7 @@ const User = ({
                 setUserSalary,
                 setUpdateModal,
                 updateUser,
+                updateUserImage,
               }) => {
   const isAdmin = () => currentUser && currentUser.role === 'admin'
   const [salary, setSalary] = useState(null)
@@ -51,26 +52,15 @@ const User = ({
   ]
 
   const handleAvatarSubmit = async () => {
-    const formData = new FormData()
     const imguser = document.querySelector('#avatarUser')
 
-    formData.append('user[avatar]', imguser.files[0])
+    const avatar = document.getElementById("avatar")
+    avatar.src = URL.createObjectURL(imguser.files[0])
 
-    try {
-      await axios.put(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${user_id}.json`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: localStorage.token,
-          },
-        },
-      )
-    } catch (error) {
-      console.log(error)
-    }
+    updateUserImage(user.id, imguser.files[0])
   }
+
+  const triggerChangeImage  = () => document.getElementById('avatarUser').click()
 
   const leave_percentage = (leave_balance, total) =>
     user ? Math.round((leave_balance / total) * 100) : 0
@@ -94,6 +84,13 @@ const User = ({
       // user && setSalaryStartDate(user.active_salary.start_date)
     }
   }, [user])
+
+  useEffect(() => {
+    // just some event listener
+    if(user?.id === currentUser?.id) {
+      document.getElementById("change-avatar").addEventListener("click", triggerChangeImage)
+    }
+  }, [])
 
   return (
     <>
@@ -128,6 +125,7 @@ const User = ({
                 src={ user.avatar_url !== '' ? `${process.env.NEXT_PUBLIC_REMOTE_URL}${user.avatar_url}` : '/default_profile.png' }
               />
               <img
+                id="change-avatar"
                 alt="change"
                 className="w-20 h-20 mx-auto rounded-full lg:w-24 lg:h-24 img-top"
                 src='/change_image.png'
@@ -137,18 +135,6 @@ const User = ({
                   <h2 className="text-2xl">
                     {user && `${user.first_name} ${user.last_name}`}
                   </h2>
-
-                  {
-                    (currentUser?.id == user.id) &&
-                    <Btn
-                      className="mr-4 bg-gray-500 hover:bg-gray-400"
-                      onClick={() =>
-                        document.getElementById('avatarUser').click()
-                      }
-                    >
-                      Change Image
-                    </Btn>
-                  }
                   <Input
                     id="avatarUser"
                     type="file"
@@ -373,5 +359,6 @@ export default connect(
     setUserSalary,
     setUpdateModal,
     updateUser,
+    updateUserImage,
   },
 )(User)
