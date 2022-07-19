@@ -121,7 +121,7 @@ const User = ({
                 id="avatar"
                 alt="Profile Pciture"
                 className="w-20 h-20 mx-auto rounded-full lg:w-24 lg:h-24 img-front"
-                src={ user.avatar_url !== '' ? `${process.env.NEXT_PUBLIC_REMOTE_URL}${user.avatar_url}` : '/default_profile.png' }
+                src={ user?.avatar_url !== '' ? user?.avatar_url : '/default_profile.png' }
               />
               <img
                 id="change-avatar"
