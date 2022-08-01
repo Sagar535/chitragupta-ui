@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import Navbar from '../components/layout/Navbar'
 
-function Error({ statusCode }) {
+const Error = ({ statusCode }) => {
   const router = useRouter()
   useEffect(() => {
     setTimeout(() => {
@@ -12,36 +12,38 @@ function Error({ statusCode }) {
   }, [])
 
   return (
-    <p>
+    <>
       <Navbar />
       {statusCode ? (
-        <>
-          {statusCode == 404 ? (
-            <>
-              <div className="not-found">
-                <h2>This page cannot be found :(</h2>
-                <p>You will be redirected to previous page in 3 seconds...</p>
-                <p>
-                  Go back to the{' '}
-                  <Link href="/">
-                    <a>Homepage</a>
-                  </Link>
-                </p>
-              </div>
-            </>
+        <p>
+          {statusCode === 404 ? (
+            <div className="not-found">
+              <h2>This page cannot be found :(</h2>
+              <p>You will be redirected to previous page in 3 seconds...</p>
+              <p>
+                Go back to the{' '}
+                <Link href="/">
+                  <a>Homepage</a>
+                </Link>
+              </p>
+            </div>
           ) : (
             `An error ${statusCode} occurred on server`
           )}
-        </>
+        </p>
       ) : (
         'An error occurred on client'
       )}
-    </p>
+    </>
   )
 }
 
 Error.getInitialProps = ({ res, err }) => {
-  const statusCode = res ? res.statusCode : err ? err.statusCode : 404
+//   const statusCode = res ? res.statusCode : err ? err.statusCode : 404
+
+    const cerr = err? err.statusCode : 404
+    const statusCode = res ? res.statusCode : cerr
+
   return { statusCode }
 }
 
