@@ -11,13 +11,15 @@
 
 2. `yarn` to install all the required packages.
 
-3. `rails s -p 4000` for backend development server.
+3. Run  backend development server.
+   ```bash
+    rails s -p 4000
+    ```
+    [backend chitraguta repository.](https://github.com/danphesl/chitragupta)
 
 4. Run the frontend development server:
 
     ```bash
-    npm run dev
-    # or
     yarn dev
     ```
 
