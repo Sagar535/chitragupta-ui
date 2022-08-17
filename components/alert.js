@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { clearErrors } from '../redux/actions/alertActions';
 
-function Alert(props) {
+const Alert = (props) => {
   const { message, type } = props.alerts;
   const show = message !== null;
   const success = type === 'success';
@@ -21,6 +21,7 @@ function Alert(props) {
               : 'bg-red-100 border-red-400 text-red-400'
           } border px-4 py-3 rounded fixed left-2/4 -translate-x-1/2`}
           role="alert"
+          style={{zIndex: 100}}
         >
           <span className="">{JSON.stringify(message)}</span>
 

@@ -35,6 +35,8 @@ export const SHOW_LEAVE_MODAL = 'SHOW_LEAVE_MODAL'
 
 // types for data table actions
 export const GET_RECORDS = 'GET_RECORDS'
+export const SET_RECORD = 'SET_RECORD'
+export const RESET_RECORD = 'RESET_RECORD'
 export const SET_FETCH_ALL_RECORDS = 'SET_FETCH_ALL_RECORDS'
 export const SET_PAGE = 'SET_PAGE'
 export const SET_BATCH = 'SET_BATCH'
@@ -43,6 +45,10 @@ export const SHOW_MODAL = 'SHOW_MODAL'
 export const GET_USER = 'GET_USER'
 export const SET_REDIRECT = 'SET_REDIRECT'
 export const RESET_REDIRECT = 'RESET_REDIRECT'
+
+export const SET_NEW_MODAL = 'SET_NEW_MODAL'
+export const SET_UDPATE_MODAL = 'SET_UPDATE_MODAL'
+export const SET_SALARY_MODAL = 'SET_SALARY_MODAL'
 
 // types for server
 export const SET_IS_SERVER = 'SET_IS_SERVER'

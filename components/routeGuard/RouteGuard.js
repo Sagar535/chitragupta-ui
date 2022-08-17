@@ -31,12 +31,12 @@ const RouteGuard = (props) => {
       props.setToken(token)
     }
     if(props.redirect) {
-      const redirect = props.redirect
+      const { redirect } = props
 
       router.push(redirect)
       props.resetRedirect()
     }
-    const publicPaths = ['/login', '/users/invitation_accept']
+    const publicPaths = ['/login', '/users/invitation_accept', '/users/account_setup']
     if (!token && !publicPaths.includes(router.pathname)) {
       router.push({
         pathname: '/login',
@@ -47,7 +47,7 @@ const RouteGuard = (props) => {
       props.loadUser()
     }
     pathCheck(router.asPath)
-  }, [props.redirect])
+  }, [props.redirect, props.user])
   return props.children
 }
 

@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { connect } from "react-redux";
 import { addGreptcha } from "../../lib/utils";
 import { acceptInvitation } from "../../redux/actions/authActions";
-import { connect } from "react-redux";
 
 const InvitationAccept = ({acceptInvitation}) => {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
-  const [error, setError] = useState("");
 
   const router = useRouter();
   const { invitation_token } = router.query;
@@ -24,30 +22,29 @@ const InvitationAccept = ({acceptInvitation}) => {
   return (
     <section className="my-8 pt-14">
       <div className="container px-2 py-2 mx-auto md:w-full md:max-w-md">
-        {error.length > 0 && (
-          <div id="error-message">
-            <span className="text-red-500">{error}</span>
-          </div>
-        )}
         <div className="w-full px-3 bg-white divide-y divide-gray-200 rounded-lg shadow">
           <div className="px-5 py-7">
-            <label className="block pb-1 text-sm font-semibold text-gray-600">
+            <label className="block pb-1 text-sm font-semibold text-gray-600" htmlFor="password">
               Password
             </label>
             <input
               type="password"
               required
               className="w-full px-3 py-3 mt-1 mb-5 text-sm border rounded-lg"
+              name="password"
+              id="password"
               onChange={(e) => setPassword(e.target.value)}
             />
 
-            <label className="block pb-1 text-sm font-semibold text-gray-600">
+            <label className="block pb-1 text-sm font-semibold text-gray-600" htmlFor="password-confirmation">
               Password Confirmation
             </label>
             <input
               type="password"
               required
               className="w-full px-3 py-3 mt-1 mb-5 text-sm border rounded-lg"
+              name="password-confirmation"
+              id="password-confirmation"
               onChange={(e) => setPasswordConfirmation(e.target.value)}
             />
             <button
@@ -64,9 +61,9 @@ const InvitationAccept = ({acceptInvitation}) => {
                 className="inline-block w-4 h-4"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M17 8l4 4m0 0l-4 4m4-4H3"
                 />
               </svg>

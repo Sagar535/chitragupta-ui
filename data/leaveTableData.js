@@ -22,9 +22,8 @@ export const columns = [
     Header: 'duration',
     accessor: 'duration',
     Cell: ({ row }) => {
-      const duration =
-        new Date(row.original.end_date) - new Date(row.original.start_date);
-      return `${Math.abs(duration / (1000 * 60 * 60 * 24))}`;
+      const { duration } = row.original
+      return duration;
     },
   },
   {

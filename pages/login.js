@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { connect } from 'react-redux'
-import axios from 'axios'
 import {
   FormContainer,
   Input,
@@ -12,7 +11,7 @@ import {
 import { login, loadUser } from '../redux/actions/authActions'
 import { addGreptcha } from "../lib/utils";
 
-function Login(props) {
+const Login = (props) => {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

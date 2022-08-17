@@ -210,6 +210,65 @@ export const acceptInvitation = (invitation_token , password, passwordConfirmati
   }
 }
 
+export const accountSetup = (account_setup_token, password, passwordConfirmation) => async(dispatch) => {
+  if (password.length < 8) {
+    dispatch(returnErrors(
+      "Password length must be greater than 8.",
+      404
+    ))
+    return;
+  } else if (password !== passwordConfirmation) {
+    dispatch(returnErrors(
+      "Password and confirmation does not match...",
+      404
+    ))
+    return;
+  }
+
+  try {
+    const score = await getCaptchaScore();
+    if (score > 0.6) {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/setup_account.json`,
+        {
+          user: {
+            password,
+            password_confirmation: passwordConfirmation,
+          },
+          account_setup_token,
+        }
+      );
+
+      if (response.statusText === "OK") {
+        // set localstorage token
+        localStorage.setItem(
+          "token",
+          `Bearer ${response.headers.authorization}`
+        );
+        // set user id
+        localStorage.setItem("user_id", response.data.user.id);
+        // redirect to page where user will fill rest of the info
+        dispatch({
+          type: SET_REDIRECT,
+          payload: "/users/profile_form"
+        })
+      } else {
+        // show error message
+        dispatch(returnErrors(
+          "Failed to set password",
+          404
+        ))
+      }
+    }
+  } catch (error) {
+    dispatch(returnErrors(
+      error.message,
+      404
+    ))
+  }
+}
+
+
 export const resetRedirect = () => (dispatch) => {
   dispatch({
     type: RESET_REDIRECT

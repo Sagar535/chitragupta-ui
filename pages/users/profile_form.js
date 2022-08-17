@@ -1,15 +1,13 @@
 import { useState } from "react";
-import { useRouter } from "next/router";
 import {connect} from "react-redux";
 import {profileFormSubmit} from "../../redux/actions/userActions";
 
 const ProfileForm = ({ profileFormSubmit }) => {
   const [user, setUser] = useState({});
-  const [error, setError] = useState('');
-  const router = useRouter();
+  let userId
 
   if (typeof window !== "undefined") {
-    const userId = localStorage.getItem("user_id");
+    userId = localStorage.getItem("user_id");
   }
 
   const formSubmit = async (e) => {
@@ -21,11 +19,6 @@ const ProfileForm = ({ profileFormSubmit }) => {
   return (
     <section className="my-8 pt-14">
       <div className="container px-2 py-2 mx-auto md:w-full md:max-w-2xl">
-        {error.length > 0 && (
-          <div id="error-message">
-            <span className="text-red-500">{error}</span>
-          </div>
-        )}
         <div className="flex flex-wrap -mx-3 mb-6">
           <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
             <label
@@ -93,6 +86,7 @@ const ProfileForm = ({ profileFormSubmit }) => {
 
         <button
           className="inline-block px-4 py-2 text-white bg-blue-500 rounded"
+          type="button"
           onClick={(e) => formSubmit(e)}
         >
           Submit

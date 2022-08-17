@@ -5,7 +5,7 @@ import Navbar from '../../components/layout/Navbar'
 import { Btn } from '../../components/formComponents'
 import Loader from '../../components/ui/loader'
 
-function Admin({ user, loading }) {
+const Admin = ({ user, loading }) => {
   const adminPages = [
     {
       topic: 'User',
