@@ -7,11 +7,13 @@ import { Btn } from '../formComponents'
 import Modal from '../modal'
 import InputWithLabelAndError from '../InputWithLabelAndError'
 import { fetchSalaries } from '../../redux/actions/dashboardActions'
-import { createSalary } from '../../redux/actions/salaryActions'
+import { createSalary, uploadSalaryCSV } from '../../redux/actions/salaryActions'
+import { returnErrors } from "../../redux/actions/alertActions";
 
-const SalariesDataTable = ({ fetchSalaries, createSalary }) => {
+const SalariesDataTable = ({ fetchSalaries, createSalary, uploadSalaryCSV, returnErrors }) => {
   const [salary, setSalary] = useState({})
   const [createNewSalary, setCreateNewSalary] = useState(false)
+  const [uploadingCSV, setUploadingCSV] = useState(false)
   const [errors, setErrors] = useState({})
 
   const creatingNewSalary = () => setCreateNewSalary(true)
@@ -62,12 +64,18 @@ const SalariesDataTable = ({ fetchSalaries, createSalary }) => {
           >
             New Salary
           </Btn>
+
+          <Btn
+            className="bg-teal-500 hover:bg-teal-600 mx-4"
+            onClick={() => {
+              setUploadingCSV(true)
+            }}
+          >
+            Bulk Upload
+          </Btn>
         </div>
 
-        <DataTable
-          columns={columns}
-          fetchFunction={fetchSalaries}
-        />
+        <DataTable columns={columns} fetchFunction={fetchSalaries} />
       </TableContainer>
       {createNewSalary && (
         <Modal
@@ -92,7 +100,40 @@ const SalariesDataTable = ({ fetchSalaries, createSalary }) => {
             ))}
           </div>
 
-          <Btn className="bg-teal-500 hover:bg-teal-600" onClick={() => newSalary()}>
+          <Btn
+            className="bg-teal-500 hover:bg-teal-600"
+            onClick={() => newSalary()}
+          >
+            Submit
+          </Btn>
+        </Modal>
+      )}
+
+      {uploadingCSV && (
+        <Modal
+          showModal={uploadingCSV}
+          setShowModal={setUploadingCSV}
+          title="New Salary"
+        >
+          <input
+            type="file"
+            id="salary-csv-upload"
+          />
+
+          <Btn
+            className="bg-teal-500 hover:bg-teal-600"
+            onClick={() => {
+              const csv = document.querySelector("#salary-csv-upload")
+              if (!csv.files[0]) {
+                returnErrors('Please select a valid file', 400)
+              } else {
+                const formData = new FormData()
+                formData.append('salaryCSVFile', csv.files[0])
+                uploadSalaryCSV(formData)
+                setUploadingCSV(false)
+              }
+            }}
+          >
             Submit
           </Btn>
         </Modal>
@@ -101,4 +142,6 @@ const SalariesDataTable = ({ fetchSalaries, createSalary }) => {
   )
 }
 
-export default connect(() => ({}), { fetchSalaries, createSalary })(SalariesDataTable)
+export default connect(() => ({}), { fetchSalaries, createSalary, uploadSalaryCSV, returnErrors })(
+  SalariesDataTable,
+)

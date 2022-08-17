@@ -4,6 +4,7 @@ import { wrapper } from '../redux/store';
 import RouteGuard from '../components/routeGuard/RouteGuard';
 import Alert from '../components/alert';
 import '../styles/globals.css';
+import '../styles/image.css'
 import '@fullcalendar/common/main.css';
 import '@fullcalendar/daygrid/main.css';
 
@@ -30,7 +31,7 @@ class WrappedApp extends App {
     return (
       <RouteGuard>
         <Head>
-          <title>Chitragupta App</title>
+          <title>Chitragupta Application</title>
           <meta name="description" content="chitragupta" />
           <link rel="icon" href="/favicon.ico" />
         </Head>

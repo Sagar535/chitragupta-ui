@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react'
-import { connect } from 'react-redux'
-import { useRouter } from 'next/router'
-import axios from 'axios'
+import {useState, useEffect} from 'react'
+import {connect} from 'react-redux'
+import {useRouter} from 'next/router'
 import Navbar from '../../../components/layout/Navbar'
 import {
   Btn,
@@ -11,30 +10,56 @@ import {
   Option,
 } from '../../../components/formComponents'
 import Modal from '../../../components/modal'
-import { fetchUser } from '../../../redux/actions/usersActions'
-import { fetchAllSalaries } from '../../../redux/actions/dashboardActions'
+import {fetchUser} from '../../../redux/actions/usersActions'
+import {fetchAllSalaries} from '../../../redux/actions/dashboardActions'
+import {setSalaryModal, setUserSalary} from "../../../redux/actions/salaryActions";
+import {setUpdateModal} from "../../../redux/actions/modalActions";
+import {updateUser, updateUserImage} from "../../../redux/actions/userActions";
 
-const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
+const User = ({
+                currentUser,
+                user,
+                salaries,
+                salaryModal,
+                updateModal,
+                fetchUser,
+                fetchAllSalaries,
+                setSalaryModal,
+                setUserSalary,
+                setUpdateModal,
+                updateUser,
+                updateUserImage,
+              }) => {
   const isAdmin = () => currentUser && currentUser.role === 'admin'
-  const [updatingUser, setUpdatingUser] = useState(false)
   const [salary, setSalary] = useState(null)
-  const [startDate, setStartDate] = useState(
+  const [joinDate, setJoinDate] = useState(null)
+  const [salaryStartDate, setSalaryStartDate] = useState(
     new Date().toISOString().slice(0, 10),
   )
   const [status, setStatus] = useState(null)
-  const [errors, setErrors] = useState({})
   const router = useRouter()
-  const { id: user_id } = router.query
+  const {id: user_id} = router.query
 
   const MAX_SICK_LEAVE_BALANCE = 5
   const MAX_PAID_LEAVE_BALANCE = 18
   const MAX_UNPAID_LEAVE_BALANCE = 25
 
   const statuses = [
-    { id: 0, status: 'invited' },
-    { id: 1, status: 'active' },
-    { id: 2, status: 'disabled' },
+    {id: 0, status: 'invited'},
+    {id: 1, status: 'active'},
+    {id: 2, status: 'disabled'},
   ]
+
+  const handleAvatarSubmit = async () => {
+    const imguser = document.querySelector('#avatarUser')
+
+    const avatar = document.getElementById("avatar")
+    avatar.src = URL.createObjectURL(imguser.files[0])
+
+    updateUserImage(user.id, imguser.files[0])
+  }
+
+  const triggerChangeImage  = () => document.getElementById('avatarUser').click()
 
   const leave_percentage = (leave_balance, total) =>
     user ? Math.round((leave_balance / total) * 100) : 0
@@ -50,57 +75,38 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
     }
   }, [currentUser])
 
-  const checkIfFormIsValid = () => {
-    let errorCount = 0
-    if (!salary) {
-      errors.salary = "Can't be blank."
-      // console.log(errors);
-      setErrors({ ...errors })
-      errorCount += 1
+  useEffect(() => {
+    if (Object.keys(user).length > 0) {
+      setSalary(user.active_salary?.id)
+      setStatus(user.status)
+      setJoinDate(user.start_date)
+      // user && setSalaryStartDate(user.active_salary.start_date)
     }
+  }, [user])
 
-    return errorCount
-  }
-
-  const updateUser = async () => {
-    if (checkIfFormIsValid() === 0) {
-      // make request to remote api to create or update user salary
-      try {
-        await axios.put(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${user_id}.json`,
-          {
-            user: {
-              user_salaries_attributes: [
-                {
-                  salary_id: salary,
-                  start_date: startDate,
-                },
-              ],
-              status,
-            },
-          },
-          {
-            headers: {
-              Authorization: localStorage.token,
-            },
-          },
-        )
-      } catch (error) {
-        console.log(error)
-        // handleUnauthorized(error, setToken, router)
-      }
+  useEffect(() => {
+    // just some event listener
+    if(user?.id === currentUser?.id) {
+      document.getElementById("change-avatar").addEventListener("click", triggerChangeImage)
     }
-  }
+  }, [])
 
   return (
     <>
-      <Navbar />
+      <Navbar/>
 
       {isAdmin() && (
         <div className="flex flex-row-reverse">
           <Btn
             className="mr-4 bg-gray-500 hover:bg-gray-400"
-            onClick={() => setUpdatingUser(true)}
+            onClick={() => setSalaryModal(true)}
+          >
+            Set New Salary
+          </Btn>
+
+          <Btn
+            className="ml-4 mr-4 bg-gray-500 hover:bg-gray-400"
+            onClick={() => setUpdateModal(true)}
           >
             Edit
           </Btn>
@@ -110,19 +116,33 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
       <div className="bg-white w-[300px] mx-auto">
         <div className="pt-10 text-center">
           <div>
-            <div>
+            <div className="profile-section">
               <img
-                className="w-20 h-20 mx-auto rounded-full lg:w-24 lg:h-24"
-                src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80"
-                alt=""
+                id="avatar"
+                alt="Profile Pciture"
+                className="w-20 h-20 mx-auto rounded-full lg:w-24 lg:h-24 img-front"
+                src={ user?.avatar_url !== '' ? user?.avatar_url : '/default_profile.png' }
+              />
+              <img
+                id="change-avatar"
+                alt="change"
+                className="w-20 h-20 mx-auto rounded-full lg:w-24 lg:h-24 img-top"
+                src='/change_image.png'
               />
               <div>
                 <div className="my-5 text-xs font-medium lg:text-sm">
                   <h2 className="text-2xl">
                     {user && `${user.first_name} ${user.last_name}`}
                   </h2>
+                  <Input
+                    id="avatarUser"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleAvatarSubmit}
+                  />
                 </div>
-                <div className="w-full my-4 border-b-2" />
+                <div className="w-full my-4 border-b-2"/>
               </div>
             </div>
 
@@ -142,8 +162,8 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
                       strokeLinejoin="round"
                       className="feather feather-mail"
                     >
-                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                      <polyline points="22,6 12,13 2,6" />
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                      <polyline points="22,6 12,13 2,6"/>
                     </svg>
                   </span>
                   {user && user.email}
@@ -165,10 +185,10 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
                       strokeLinejoin="round"
                       className="feather feather-calendar"
                     >
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                      <line x1="16" y1="2" x2="16" y2="6" />
-                      <line x1="8" y1="2" x2="8" y2="6" />
-                      <line x1="3" y1="10" x2="21" y2="10" />
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
                     </svg>
                   </span>
                   {user && user.start_date}
@@ -245,21 +265,18 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
         </div>
       </div>
 
-      {updatingUser && (
+      {salaryModal && (
         <Modal
-          showModal={updatingUser}
-          setShowModal={setUpdatingUser}
-          title="Update User"
+          showModal={salaryModal}
+          setShowModal={setSalaryModal}
+          title="Set User Salary"
         >
           <div>
-            <Label
-              className={`${errors.salary ? 'text-red-500' : 'text-gray-500'}`}
-            >
+            <Label>
               Select salary
             </Label>
             <Select
               onChange={(e) => setSalary(e.target.value)}
-              className={errors.salary ? 'border-red-500' : ''}
               defaultValue={user.active_salary && user.active_salary.id}
             >
               <Option>...</Option>
@@ -270,18 +287,33 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
                 </Option>
               ))}
             </Select>
-            {errors.salary && (
-              <span className="text-sm text-red-500">{errors.salary}</span>
-            )}
 
-            <Label
-              className={`${errors.salary ? 'text-red-500' : 'text-gray-500'}`}
-            >
+            <Label>New Salary Start Date</Label>
+            <Input
+              value={salaryStartDate}
+              onChange={(e) => setSalaryStartDate(e.target.value)}
+              type="date"
+            />
+
+            <Btn className="bg-green-400" onClick={() => setUserSalary(user_id, salary, salaryStartDate)}>
+              Submit
+            </Btn>
+          </div>
+        </Modal>
+      )}
+
+      {updateModal && (
+        <Modal
+          showModal={updateModal}
+          setShowModal={setUpdateModal}
+          title="Update User"
+        >
+          <div>
+            <Label>
               Select Status
             </Label>
             <Select
               onChange={(e) => setStatus(e.target.value)}
-              className={errors.status ? 'border-red-500' : ''}
               defaultValue={user.status}
             >
               <Option value={null}>...</Option>
@@ -291,18 +323,15 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
                 </Option>
               ))}
             </Select>
-            {errors.status && (
-              <span className="text-sm text-red-500">{errors.status}</span>
-            )}
 
-            <Label>Start Date</Label>
+            <Label>Join Date</Label>
             <Input
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              value={joinDate}
+              onChange={(e) => setJoinDate(e.target.value)}
               type="date"
             />
 
-            <Btn className="bg-green-400" onClick={updateUser}>
+            <Btn className="bg-green-400" onClick={() => updateUser(user_id, {status, start_date: joinDate})}>
               Submit
             </Btn>
           </div>
@@ -312,10 +341,23 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
   )
 }
 
+const mapStateToProps = (state) => ({
+  currentUser: state.auth.user,
+  user: state.users.user,
+  salaries: state.records.records,
+  salaryModal: state.modal.salaryModal,
+  updateModal: state.modal.updateModal,
+})
+
 export default connect(
-  (state) => ({ currentUser: state.auth.user, user: state.users.user, salaries: state.records.records }),
+  mapStateToProps,
   {
     fetchUser,
     fetchAllSalaries,
+    setSalaryModal,
+    setUserSalary,
+    setUpdateModal,
+    updateUser,
+    updateUserImage,
   },
 )(User)
